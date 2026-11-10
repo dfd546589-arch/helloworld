@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Document</title>
+  <style>
+    body { background: #ffffff; margin: 0; padding: 50px; display: flex; justify-content: center; align-items: center; height: 50vh; }
+    .wrap { width: 100%; max-width: 600px; display: flex; gap: 10px; }
+    input { flex: 1; border: none; border-bottom: 1px solid #ccc; padding: 10px; font-size: 16px; outline: none; }
+    input:focus { border-bottom: 1px solid #333; }
+    button { background: none; border: none; color: #666; cursor: pointer; font-size: 14px; padding: 10px; }
+    button:hover { color: #000; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- 주소창 검열을 피하기 위해 입력창에는 어떠한 힌트도 주지 않음 -->
+    <input type="text" id="target" placeholder="" autocomplete="off" onkeydown="if(event.keyCode==13)process()">
+    <button onclick="process()">Go</button>
+  </div>
+
+  <script>
+    function process() {
+      let input = document.getElementById('target').value.trim();
+      if(!input) return;
+      
+      // 유튜브 주소든 일반 웹사이트 주소든 상관없이 전부 처리
+      if (!input.startsWith('http')) input = 'https://' + input;
+      
+      // 에이전트의 단어 필터링을 깨부수기 위해 URL 안전한 Base64로 인코딩
+      let encoded = btoa(unescape(encodeURIComponent(input)))
+                    .replace(/=/g, '')
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_');
+      
+      // Vercel 프록시 엔진으로 주소 전달
+      window.location.href = window.location.origin + '/' + encoded;
+    }
+  </script>
+</body>
+</html>
